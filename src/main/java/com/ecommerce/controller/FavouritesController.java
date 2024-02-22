@@ -34,19 +34,15 @@ public class FavouritesController {
 
 
     @GetMapping("/add-to-favourites")
-    public BaseResponse<ResponseDto<FavouritesDto>> addProductToFavourites (@RequestParam Integer productId, @RequestHeader (HttpHeaders.AUTHORIZATION) String token) throws UserException, ProductException {
+    public ResponseEntity<?> addProductToFavourites (@RequestParam Integer productId, @RequestHeader (HttpHeaders.AUTHORIZATION) String token) throws UserException, ProductException {
 
-        ResponseDto<FavouritesDto> responseDto = new ResponseDto<>();
         String fiscalCode = jwtGenerator.getFiscalCodeFromJWT(token);
 
         try {
             FavouritesDto favouritesDto = favouritesMapper.toFavouritesDto(favouritesService.addToFavourites(productId, fiscalCode));
-            responseDto.setResponse(favouritesDto);
-            responseDto.setSuccess(true);
-            return new BaseResponse<ResponseDto<FavouritesDto>>().asSuccess(responseDto);
+            return new ResponseEntity<>(new ResponseDto<>(favouritesDto, true), HttpStatus.OK);
         } catch (FavouritesException ex){
-
-            return new BaseResponse().asError(ex.getMessage());
+            return new ResponseEntity<>(new ResponseDto<>(ex.getMessage(), false), HttpStatus.BAD_REQUEST);
         }
 
     }

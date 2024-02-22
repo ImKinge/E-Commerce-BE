@@ -4,6 +4,7 @@ import com.ecommerce.dto.OrdersDto;
 import com.ecommerce.dto.ResponseDto;
 import com.ecommerce.entity.Orders;
 import com.ecommerce.exception.ProductException;
+import com.ecommerce.exception.ResultQueryException;
 import com.ecommerce.exception.UserException;
 import com.ecommerce.mapper.OrdersMapper;
 import com.ecommerce.security.jwt.JWTGenerator;
@@ -32,14 +33,19 @@ public class OrdersController {
 
 
     @PostMapping("/add-to-orders")
-    public ResponseEntity<ResponseDto<List<OrdersDto>>> addProductToOrders (@RequestBody List<Orders> ordersList,
+    public ResponseEntity<?> addProductToOrders (@RequestBody List<Orders> ordersList,
                                                                       @RequestHeader (HttpHeaders.AUTHORIZATION) String token) throws UserException, ProductException {
 
         String fiscalCode = jwtGenerator.getFiscalCodeFromJWT(token);
 
-        List<OrdersDto> ordersDtoList = ordersMapper.toOrdersDtoList(ordersService.addToOrders(ordersList, fiscalCode));
+        try {
+            List<OrdersDto> ordersDtoList = ordersMapper.toOrdersDtoList(ordersService.addToOrders(ordersList, fiscalCode));
 
-        return new ResponseEntity<>(new ResponseDto<>(ordersDtoList, true), HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseDto<>(ordersDtoList, true), HttpStatus.OK);
+        } catch (ResultQueryException ex) {
+            return new ResponseEntity<>(new ResponseDto<>(ex.getMessage(), false), HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @GetMapping("/get-all-orders")

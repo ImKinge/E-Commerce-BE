@@ -2,6 +2,7 @@ package com.ecommerce.controller;
 
 
 import com.ecommerce.dto.*;
+import com.ecommerce.exception.ResultQueryException;
 import com.ecommerce.exception.UserException;
 import com.ecommerce.repository.UserRepository;
 import com.ecommerce.security.jwt.JWTGenerator;
@@ -13,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -46,15 +48,16 @@ public class JwtAuthenticationController {
     }
 
     @PostMapping(value = "/login")
-    public BaseResponse<ResponseDto<AuthResponseDto>> login(@RequestBody JwtRequest jwtRequest) {
-
-        ResponseDto<AuthResponseDto> responseDto = new ResponseDto<>();
+    public ResponseEntity<?> login(@RequestBody JwtRequest jwtRequest) {
 
         try{
             UserDto userDto = userService.findByUsername(jwtRequest.getUsername());
             String fiscalCode = userDto.getFiscalCode();
 
-//            if()
+            boolean passwordCheck = BCrypt.checkpw(jwtRequest.getPassword(), userDto.getPassword());
+            if(!passwordCheck) {
+                throw new ResultQueryException("Password Errata");
+            }
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             jwtRequest.getUsername(),
@@ -64,12 +67,11 @@ public class JwtAuthenticationController {
             String token = jwtGenerator.generateToken(authentication.getName(), fiscalCode);
             AuthResponseDto authResponseDto = new AuthResponseDto(token);
 
-            responseDto.setResponse(authResponseDto);
-            responseDto.setSuccess(true);
-            return new BaseResponse<ResponseDto<AuthResponseDto>>().asSuccess(responseDto);
+            return new ResponseEntity<>(new ResponseDto<>(authResponseDto, true), HttpStatus.OK);
         } catch (UserException ex){
-
-            return new BaseResponse().asError(ex.getMessage());
+            return new ResponseEntity<>(new ResponseDto<>(ex.getMessage(), false), HttpStatus.BAD_REQUEST);
+        } catch (ResultQueryException ex) {
+            return new ResponseEntity<>(new ResponseDto<>(ex.getMessage(), false), HttpStatus.BAD_REQUEST);
         }
     }
 }
