@@ -28,8 +28,13 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private Set<Favourites> favouritesSet;
 
-    @OneToMany(mappedBy = "product")
-    private List<Orders> orderList;
+    @ManyToMany
+    @JoinTable(name = "orders_product",
+            joinColumns = @JoinColumn(name = "product_id", nullable = false, referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "orders_id", nullable = false, referencedColumnName = "id"))
+    private List<Orders> orders;
+
+
 
 
     public Product () {

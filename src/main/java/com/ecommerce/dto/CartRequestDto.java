@@ -1,27 +1,29 @@
 package com.ecommerce.dto;
 
-import com.ecommerce.entity.Orders;
 import com.ecommerce.entity.Product;
+import com.ecommerce.entity.UserData;
+
 
 import java.util.List;
 
-public class OrdersDto {
+public class CartRequestDto {
 
-    private Orders ordersList;
 
+    private UserData userData;
     private List<Product> productList;
 
 
-    public OrdersDto() {
+    public CartRequestDto() {
+
     }
 
 
-    public Orders getOrdersList() {
-        return ordersList;
+    public UserData getUserData() {
+        return userData;
     }
 
-    public void setOrdersList(Orders ordersList) {
-        this.ordersList = ordersList;
+    public void setUserData(UserData userData) {
+        this.userData = userData;
     }
 
     public List<Product> getProductList() {
@@ -31,4 +33,5 @@ public class OrdersDto {
     public void setProductList(List<Product> productList) {
         this.productList = productList;
     }
+
 }

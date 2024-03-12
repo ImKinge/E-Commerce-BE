@@ -3,21 +3,22 @@ package com.ecommerce.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class Orders {
 
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserData userData;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @ManyToMany(mappedBy = "orders")
+    private List<Product> productList;
 
     @Column(name = "purchase_date")
     private LocalDateTime purchaseDate;
@@ -26,9 +27,9 @@ public class Orders {
 
     }
 
-    public Orders(UserData userData, Product product, LocalDateTime purchaseDate) {
+    public Orders(UserData userData, List<Product> productList, LocalDateTime purchaseDate) {
         this.userData = userData;
-        this.product = product;
+        this.productList = productList;
         this.purchaseDate = purchaseDate;
     }
 
@@ -48,12 +49,12 @@ public class Orders {
         this.userData = userData;
     }
 
-    public Product getProduct() {
-        return product;
+    public List<Product> getProductList() {
+        return productList;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductList(List<Product> productList) {
+        this.productList = productList;
     }
 
     public LocalDateTime getPurchaseDate() {

@@ -1,35 +1,48 @@
 package com.ecommerce.mapper;
 
-import com.ecommerce.dto.OrdersDto;
+import com.ecommerce.dto.CartRequestDto;
 import com.ecommerce.entity.Orders;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class OrdersMapperImpl implements OrdersMapper {
     @Override
-    public OrdersDto toOrdersDto(Orders orders) {
+    public CartRequestDto toOrdersDto(Orders orders) {
 
-        OrdersDto ordersDto = new OrdersDto();
+        CartRequestDto cartRequestDto = new CartRequestDto();
 
-        ordersDto.setUser(orders.getUserData());
-        ordersDto.setProduct(orders.getProduct());
-        ordersDto.setPurchaseDate(orders.getPurchaseDate());
+        cartRequestDto.setUserData(orders.getUserData());
+        cartRequestDto.setProductList(orders.getProductList());
 
-        return ordersDto;
+        return cartRequestDto;
     }
 
     @Override
-    public List<OrdersDto> toOrdersDtoList(List<Orders> ordersList) {
+    public Orders toOrders(CartRequestDto orderDto) {
 
-        List<OrdersDto> ordersDtoList = new ArrayList<>();
+        Orders orders = new Orders();
+        LocalDateTime localDateTime = LocalDateTime.now();
+
+        orders.setUserData(orderDto.getUserData());
+        orders.setPurchaseDate(localDateTime);
+
+        return orders;
+    }
+
+
+    @Override
+    public List<CartRequestDto> toOrdersDtoList(List<Orders> ordersList) {
+
+        List<CartRequestDto> cartRequestDtoList = new ArrayList<>();
 
         for(Orders orders : ordersList) {
-            ordersDtoList.add(toOrdersDto(orders));
+            cartRequestDtoList.add(toOrdersDto(orders));
         }
 
-        return ordersDtoList;
+        return cartRequestDtoList;
     }
 }

@@ -1,8 +1,7 @@
 package com.ecommerce.controller;
 
-import com.ecommerce.dto.OrdersDto;
+import com.ecommerce.dto.CartRequestDto;
 import com.ecommerce.dto.ResponseDto;
-import com.ecommerce.entity.Orders;
 import com.ecommerce.exception.ProductException;
 import com.ecommerce.exception.ResultQueryException;
 import com.ecommerce.exception.UserException;
@@ -33,15 +32,15 @@ public class OrdersController {
 
 
     @PostMapping("/add-to-orders")
-    public ResponseEntity<?> addProductToOrders (@RequestBody List<Orders> ordersList,
+    public ResponseEntity<?> addProductToOrders (@RequestBody CartRequestDto cartRequestDto,
                                                                       @RequestHeader (HttpHeaders.AUTHORIZATION) String token) throws UserException, ProductException {
 
         String fiscalCode = jwtGenerator.getFiscalCodeFromJWT(token);
 
         try {
-            List<OrdersDto> ordersDtoList = ordersMapper.toOrdersDtoList(ordersService.addToOrders(ordersList, fiscalCode));
+            ordersService.addToOrders(cartRequestDto, fiscalCode);
 
-            return new ResponseEntity<>(new ResponseDto<>(ordersDtoList, true), HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseDto<>(cartRequestDto, true), HttpStatus.OK);
         } catch (ResultQueryException ex) {
             return new ResponseEntity<>(new ResponseDto<>(ex.getMessage(), false), HttpStatus.BAD_REQUEST);
         }
@@ -49,12 +48,12 @@ public class OrdersController {
     }
 
     @GetMapping("/get-all-orders")
-    public ResponseEntity<ResponseDto<List<OrdersDto>>> getAllOrdersByFiscalCode (@RequestHeader (HttpHeaders.AUTHORIZATION) String token) {
+    public ResponseEntity<ResponseDto<List<CartRequestDto>>> getAllOrdersByFiscalCode (@RequestHeader (HttpHeaders.AUTHORIZATION) String token) {
 
         String fiscalCode = jwtGenerator.getFiscalCodeFromJWT(token);
 
-        List<OrdersDto> ordersDtoList = ordersService.findAllOrdersByUser(fiscalCode);
+        List<CartRequestDto> cartRequestDtoList = ordersService.findAllOrdersByUser(fiscalCode);
 
-        return new ResponseEntity<>(new ResponseDto<>(ordersDtoList, true), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseDto<>(cartRequestDtoList, true), HttpStatus.OK);
     }
 }
