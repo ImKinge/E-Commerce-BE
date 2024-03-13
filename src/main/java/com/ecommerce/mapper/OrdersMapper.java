@@ -1,15 +1,15 @@
 package com.ecommerce.mapper;
 
 import com.ecommerce.dto.CartRequestDto;
+import com.ecommerce.dto.OrdersDto;
 import com.ecommerce.entity.Orders;
 
 import java.util.List;
 
 public interface OrdersMapper {
 
-    CartRequestDto toOrdersDto (Orders orders);
-
     Orders toOrders (CartRequestDto orderDto);
 
-    List<CartRequestDto> toOrdersDtoList (List<Orders> ordersList);
+    OrdersDto toOrdersDto (Orders orders);
+    List<OrdersDto> toOrderDtoList (List<Orders> ordersList);
 }

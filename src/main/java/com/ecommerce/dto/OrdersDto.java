@@ -1,34 +1,53 @@
 package com.ecommerce.dto;
 
-import com.ecommerce.entity.Orders;
-import com.ecommerce.entity.Product;
-
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrdersDto {
 
-    private Orders ordersList;
+    private Integer orderId;
 
-    private List<Product> productList;
+    private List<String> productDtoList = new ArrayList<>();
+
+    private LocalDateTime purchaseDate;
 
 
     public OrdersDto() {
     }
 
-
-    public Orders getOrdersList() {
-        return ordersList;
+    public OrdersDto(Integer orderId, LocalDateTime purchaseDate) {
+        this.orderId = orderId;
+        this.purchaseDate = purchaseDate;
     }
 
-    public void setOrdersList(Orders ordersList) {
-        this.ordersList = ordersList;
+    public OrdersDto(Integer orderId, List<String> productDtoList, LocalDateTime purchaseDate) {
+        this.orderId = orderId;
+        this.productDtoList = productDtoList;
+        this.purchaseDate = purchaseDate;
     }
 
-    public List<Product> getProductList() {
-        return productList;
+    public Integer getOrderId() {
+        return orderId;
     }
 
-    public void setProductList(List<Product> productList) {
-        this.productList = productList;
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
+    }
+
+    public List<String> getProductDtoList() {
+        return productDtoList;
+    }
+
+    public void setProductDtoList(List<String> productDtoList) {
+        this.productDtoList = productDtoList;
+    }
+
+    public LocalDateTime getPurchaseDate() {
+        return purchaseDate;
+    }
+
+    public void setPurchaseDate(LocalDateTime purchaseDate) {
+        this.purchaseDate = purchaseDate;
     }
 }

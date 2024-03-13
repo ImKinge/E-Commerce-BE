@@ -4,15 +4,16 @@ import com.ecommerce.dto.CartRequestDto;
 import com.ecommerce.dto.OrdersDto;
 import com.ecommerce.entity.Orders;
 import com.ecommerce.entity.Product;
+import com.ecommerce.entity.UserData;
 import com.ecommerce.exception.ResultQueryException;
 import com.ecommerce.mapper.OrdersMapper;
 import com.ecommerce.repository.CartRepository;
 import com.ecommerce.repository.OrdersRepository;
+import com.ecommerce.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class OrdersServiceImpl implements OrdersService{
@@ -22,6 +23,9 @@ public class OrdersServiceImpl implements OrdersService{
 
     @Autowired
     private CartRepository cartRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private OrdersMapper ordersMapper;
@@ -72,10 +76,44 @@ public class OrdersServiceImpl implements OrdersService{
     }
 
     @Override
-    public List<CartRequestDto> findAllOrdersByUser(String fiscalCode) {
+    public List<OrdersDto> findAllByFiscalCode(String fiscalCode) throws ResultQueryException {
 
-        List<Orders> ordersDtoList = ordersRepository.findAllByFiscalCode(fiscalCode);
-
-        return ordersMapper.toOrdersDtoList(ordersDtoList);
+        UserData userData = userRepository.findByFiscalCode(fiscalCode).orElseThrow(() -> new ResultQueryException("Nessun utente trovato con codice fiscale: " + fiscalCode));
+        return ordersMapper.toOrderDtoList(ordersRepository.findAllByUserData(userData));
     }
+
+    /*
+    @Override
+    public Set<OrdersDto> findAllOrdersByUser(String fiscalCode) {
+
+        List<OrderProduct> orderProductList = orderProductRepository.findAllByFiscalCode(fiscalCode);
+        Set<OrdersDto> ordersDtoSet = new HashSet<>();
+
+        for(OrderProduct orderProduct : orderProductList) {
+
+            OrdersDto ordersDto = new OrdersDto();
+            ordersDto.setOrderId(orderProduct.getOrderId());
+            ordersDto.setPurchaseDate(orderProduct.getPurchaseDate());
+            ordersDtoSet.add(ordersDto);
+            for (OrdersDto ordersDto1 : ordersDtoSet) {
+                if(ordersDto1.getOrderId() == ordersDto.getOrderId()) {
+                    ordersDtoSet.remove(ordersDto1);
+                }
+
+            }
+        }
+
+        for(OrderProduct orderProduct : orderProductList) {
+            for(OrdersDto ordersDto1 : ordersDtoSet) {
+                if(ordersDto1.getOrderId() == orderProduct.getOrderId()) {
+                    ordersDto1.getProductDtoList().add(orderProduct.getName());
+                }
+            }
+        }
+
+        return ordersDtoSet;
+    }
+     */
+
+
 }

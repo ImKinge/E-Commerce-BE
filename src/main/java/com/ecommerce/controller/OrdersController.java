@@ -1,11 +1,11 @@
 package com.ecommerce.controller;
 
 import com.ecommerce.dto.CartRequestDto;
+import com.ecommerce.dto.OrdersDto;
 import com.ecommerce.dto.ResponseDto;
 import com.ecommerce.exception.ProductException;
 import com.ecommerce.exception.ResultQueryException;
 import com.ecommerce.exception.UserException;
-import com.ecommerce.mapper.OrdersMapper;
 import com.ecommerce.security.jwt.JWTGenerator;
 import com.ecommerce.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +27,6 @@ public class OrdersController {
     @Autowired
     private JWTGenerator jwtGenerator;
 
-    @Autowired
-    private OrdersMapper ordersMapper;
-
 
     @PostMapping("/add-to-orders")
     public ResponseEntity<?> addProductToOrders (@RequestBody CartRequestDto cartRequestDto,
@@ -48,12 +45,12 @@ public class OrdersController {
     }
 
     @GetMapping("/get-all-orders")
-    public ResponseEntity<ResponseDto<List<CartRequestDto>>> getAllOrdersByFiscalCode (@RequestHeader (HttpHeaders.AUTHORIZATION) String token) {
+    public ResponseEntity<ResponseDto<List<OrdersDto>>> getAllOrdersByFiscalCode (@RequestHeader (HttpHeaders.AUTHORIZATION) String token) throws ResultQueryException {
 
         String fiscalCode = jwtGenerator.getFiscalCodeFromJWT(token);
 
-        List<CartRequestDto> cartRequestDtoList = ordersService.findAllOrdersByUser(fiscalCode);
+        List<OrdersDto> ordersDtoList = ordersService.findAllByFiscalCode(fiscalCode);
 
-        return new ResponseEntity<>(new ResponseDto<>(cartRequestDtoList, true), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseDto<>(ordersDtoList, true), HttpStatus.OK);
     }
 }
